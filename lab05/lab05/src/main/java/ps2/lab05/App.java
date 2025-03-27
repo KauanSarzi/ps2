@@ -5,6 +5,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import static java.lang.System.out;
+
+import java.util.Optional;
 import java.util.Scanner;
 
 @SpringBootApplication
@@ -62,7 +64,51 @@ public class App implements CommandLineRunner {
 			out.println(t.getId() + " - " + t.getNome() + " - " + t.getCpf() );
 		}
 	}
-	public void ler() {} 
-	public void alterar() {}
-	public void apagar() {}
+	public void ler() {
+		out.print("# Digite o ID do titular que deseja consultar: ");
+		long id = Long.parseLong(entrada.nextLine());
+		Optional<Titular> opt = titularRepo.findById(id);
+		if (opt.isPresent()) {
+			Titular t = opt.get();
+			out.println("Titular encontrado:");
+			out.println("ID: " + t.getId());
+			out.println("Nome: " + t.getNome());
+			out.println("CPF: " + t.getCpf());
+		} 
+		else {
+			out.println("## Titular com ID " + id + " não encontrado.");
+		}
+	} 
+
+
+	public void alterar() {
+		out.print("# Digite o ID do titular que deseja alterar: ");
+		long id = Long.parseLong(entrada.nextLine());
+		Optional<Titular> opt = titularRepo.findById(id);
+		if (opt.isPresent()) {
+			Titular t = opt.get();
+			out.println("Titular atual: " + t.getNome() + " - " + t.getCpf());
+			out.print("# Novo nome: ");
+			String novoNome = entrada.nextLine();
+			out.print("# Novo CPF: ");
+			String novoCpf = entrada.nextLine();
+			t.setNome(novoNome);
+			t.setCpf(novoCpf);
+			titularRepo.save(t);
+			out.println("## Titular atualizado com sucesso!");
+		} else {
+			out.println("## Titular com ID " + id + " não encontrado.");
+		}
+	}
+	public void apagar() {
+		out.print("# Digite o ID do titular que deseja remover: ");
+		long id = Long.parseLong(entrada.nextLine());
+		if (titularRepo.existsById(id)) {
+			titularRepo.deleteById(id);
+			out.println("## Titular removido com sucesso!");
+		} else {
+			out.println("## Titular com ID " + id + " não encontrado.");
+		}
+
+	}
 }
